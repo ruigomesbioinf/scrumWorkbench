@@ -29,5 +29,5 @@ ignore = ["E203", "E231"]
 [tool.mypy]
 strict = true
 
-[tool.pytest.ini.options]
+[tool.pytest.ini_options]
 asyncio_mode = "auto"
