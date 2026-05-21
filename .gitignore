@@ -1,0 +1,23 @@
+# Python / UV
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+.ruff_cache/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+.env
+.env.local
+.env.production.local
+
+# VSCode
+.vscode/
+
+# MacOS
+.DS_Store
+*.log
