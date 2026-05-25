@@ -9,7 +9,7 @@ DECKS: dict[DeckType, CardDeck] = {
     DeckType.TIMEBOX: CardDeck(
         deck_type=DeckType.TIMEBOX,
         display_name="Timebox",
-        values=("1", "2", "3", "4", "5", "?"),
+        values=("0.5", "1", "2", "3", "4", "5", "?"),
     ),
     DeckType.TSHIRT: CardDeck(
         deck_type=DeckType.TSHIRT,

@@ -44,12 +44,17 @@ class TestDeckValues:
         deck = get_deck(deck_type=deck_type)
         assert "?" in deck.values, f"Deck {deck.display_name} does not contain an unknown card"
 
-    @pytest.mark.parametrize("deck_type", [DeckType.FIBONACCI, DeckType.TIMEBOX])
-    def test_fibonnaci_timebox_numeric_values_are_valid_integers(self, deck_type: DeckType) -> None:
-        deck = get_deck(deck_type=deck_type)
-        numeric_values = [value for value in deck.values if value != "?"]
-        for value in numeric_values:
+    def test_fibonnaci_numeric_values_are_valid_integers(self) -> None:
+        deck = get_deck(deck_type=DeckType.FIBONACCI)
+        values = [value for value in deck.values if value != "?"]
+        for value in values:
             assert value.isdigit(), f"Deck {deck.display_name} contains non-numeric value: {value}"
+
+    def test_timebox_numeric_values_are_valid_floats(self) -> None:
+        deck = get_deck(deck_type=DeckType.TIMEBOX)
+        values = [value for value in deck.values if value != "?"]
+        for value in values:
+            assert float(value), f"Deck {deck.display_name} contains non-numeric value: {value}"
 
     def test_tshirt_values_are_uppercase_alphabetic(self) -> None:
         deck = get_deck(deck_type=DeckType.TSHIRT)
