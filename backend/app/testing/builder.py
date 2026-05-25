@@ -2,6 +2,7 @@ import random
 import uuid
 
 from app.models.deck import CardDeck, DeckType
+from app.models.rooms import Player, Room, RoomState
 
 
 class Builder:
@@ -41,40 +42,40 @@ class BuildPlayer:
         username: str | None = None,
         vote: str | None = None,
         is_connected: bool = True,
-    ) -> dict[str, object]:
-        return {
-            "player_id": player_id or str(uuid.uuid4()),
-            "username": username or Builder.random_string("Player"),
-            "vote": vote,
-            "is_connected": is_connected,
-        }
+    ) -> Player:
+        return Player(
+            player_id=player_id or str(uuid.uuid4()),
+            username=username or Builder.random_string("Player"),
+            vote=vote,
+            is_connected=is_connected,
+        )
 
     @staticmethod
-    def default_player() -> dict[str, object]:
-        return {
-            "player_id": str(uuid.uuid4()),
-            "username": Builder.random_string("Player"),
-            "vote": None,
-            "is_connected": True,
-        }
+    def default_player() -> Player:
+        return Player(
+            player_id=str(uuid.uuid4()),
+            username=Builder.random_string("Player"),
+            vote=None,
+            is_connected=True,
+        )
 
     @staticmethod
-    def voted_player(vote: str) -> dict[str, object]:
-        return {
-            "player_id": str(uuid.uuid4()),
-            "username": Builder.random_string("Player"),
-            "vote": vote,
-            "is_connected": True,
-        }
+    def voted_player(vote: str) -> Player:
+        return Player(
+            player_id=str(uuid.uuid4()),
+            username=Builder.random_string("Player"),
+            vote=vote,
+            is_connected=True,
+        )
 
     @staticmethod
-    def disconnected_player() -> dict[str, object]:
-        return {
-            "player_id": str(uuid.uuid4()),
-            "username": Builder.random_string("Player"),
-            "vote": None,
-            "is_connected": False,
-        }
+    def disconnected_player() -> Player:
+        return Player(
+            player_id=str(uuid.uuid4()),
+            username=Builder.random_string("Player"),
+            vote=None,
+            is_connected=False,
+        )
 
 
 class BuildRoom:
@@ -83,41 +84,41 @@ class BuildRoom:
         *,
         room_id: str | None = None,
         deck: CardDeck | None = None,
-        state: str = "voting",
-        players: dict[str, object] | None = None,
-    ) -> dict[str, object]:
-        return {
-            "room_id": room_id or str(uuid.uuid4()),
-            "deck": deck or Builder.build_random_card_deck(),
-            "state": state,
-            "players": players or {},
-        }
+        state: RoomState = RoomState.VOTING,
+        players: dict[str, Player] | None = None,
+    ) -> Room:
+        return Room(
+            room_id=room_id or str(uuid.uuid4()),
+            deck=deck or Builder.build_random_card_deck(),
+            state=state,
+            players=players or {},
+        )
 
     @staticmethod
-    def default_room() -> dict[str, object]:
-        return {
-            "room_id": str(uuid.uuid4()),
-            "deck": Builder.build_random_card_deck(),
-            "state": "voting",
-            "players": {},
-        }
+    def default_room() -> Room:
+        return Room(
+            room_id=str(uuid.uuid4()),
+            deck=Builder.build_random_card_deck(),
+            state=RoomState.VOTING,
+            players={},
+        )
 
     @staticmethod
-    def room_with_players(num_players: int = 3) -> dict[str, object]:
-        players = {BuildPlayer.build_random_player() for _ in range(num_players)}
-        return {
-            "room_id": str(uuid.uuid4()),
-            "deck": Builder.build_random_card_deck(),
-            "state": "voting",
-            "players": players,
-        }
+    def room_with_players(num_players: int = 3) -> Room:
+        players = [BuildPlayer.build_random_player() for _ in range(num_players)]
+        return Room(
+            room_id=str(uuid.uuid4()),
+            deck=Builder.build_random_card_deck(),
+            state=RoomState.VOTING,
+            players={p.player_id: p for p in players},
+        )
 
     @staticmethod
-    def revealed_room_with_players(num_players: int = 3) -> dict[str, object]:
-        players = {BuildPlayer.build_random_player() for _ in range(num_players)}
-        return {
-            "room_id": str(uuid.uuid4()),
-            "deck": Builder.build_random_card_deck(),
-            "state": "revealed",
-            "players": players,
-        }
+    def revealed_room_with_players(num_players: int = 3) -> Room:
+        players = [BuildPlayer.build_random_player() for _ in range(num_players)]
+        return Room(
+            room_id=str(uuid.uuid4()),
+            deck=Builder.build_random_card_deck(),
+            state=RoomState.REVEALED,
+            players={p.player_id: p for p in players},
+        )
