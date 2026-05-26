@@ -1,25 +1,40 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+from app.exceptions import InvalidVoteError, PlayerNotFoundError, RoomNotFoundError, VotingClosedError
+from app.routers.rooms import room_router
 
 app = FastAPI()
+app.include_router(room_router)
 
 
-class HealthCheckResponse(BaseModel):
-    status: str = "OK"
+@app.exception_handler(RoomNotFoundError)
+def room_not_found_exception_handler(request: Request, exc: RoomNotFoundError) -> JSONResponse:
+    return JSONResponse(
+        status_code=404,
+        content={"detail": exc.message},
+    )
 
 
-@app.get("/")
-async def root() -> dict[str, str]:
-    return {"message": "Hello World, welcome to life!"}
+@app.exception_handler(PlayerNotFoundError)
+def player_not_found_exception_handler(request: Request, exc: PlayerNotFoundError) -> JSONResponse:
+    return JSONResponse(
+        status_code=404,
+        content={"detail": exc.message},
+    )
 
 
-@app.get(
-    "/health",
-    tags=["health_check"],
-    summary="Perform an application health check",
-    response_description="Health check response indicating the status of the application via status code",
-    status_code=200,
-    response_model=HealthCheckResponse,
-)
-async def health() -> HealthCheckResponse:
-    return HealthCheckResponse(status="ok")
+@app.exception_handler(InvalidVoteError)
+def invalid_vote_exception_handler(request: Request, exc: InvalidVoteError) -> JSONResponse:
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.message},
+    )
+
+
+@app.exception_handler(VotingClosedError)
+def voting_closed_exception_handler(request: Request, exc: VotingClosedError) -> JSONResponse:
+    return JSONResponse(
+        status_code=409,
+        content={"detail": exc.message},
+    )
