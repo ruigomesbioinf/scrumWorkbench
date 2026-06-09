@@ -3,9 +3,11 @@ from fastapi.responses import JSONResponse
 
 from app.exceptions import InvalidVoteError, PlayerNotFoundError, RoomNotFoundError, VotingClosedError
 from app.routers.rooms import room_router
+from app.routers.ws import ws_router
 
 app = FastAPI()
 app.include_router(room_router)
+app.include_router(ws_router)
 
 
 @app.exception_handler(RoomNotFoundError)
