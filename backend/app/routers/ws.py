@@ -37,7 +37,7 @@ async def _handle_join(
     websocket: WebSocket,
     room_service: RoomService,
     connection_manager: ConnectionManager,
-) -> Player:
+) -> Player | None:
     try:
         message = IncomingMessage.model_validate(await websocket.receive_json())
     except ValidationError:
@@ -46,12 +46,12 @@ async def _handle_join(
 
     if message.type != IncomingEventType.JOIN:
         await websocket.send_json(error_message("First message must be JOIN"))
-        raise ValueError("Expected JOIN")
+        return None
 
     username = message.payload.get("username")
     if not username:
         await websocket.send_json(error_message("Username is required to join"))
-        raise ValueError("Missing username")
+        return None
 
     player = room_service.add_player(room_id, username)
     await connection_manager.broadcast(room_id, player_joined_message(player))
@@ -117,6 +117,8 @@ async def websocket_endpoint(
         await connection_manager.connect(room_id, websocket)
         room_service.get_room(room_id)
         player = await _handle_join(room_id, websocket, room_service, connection_manager)
+        if player is None:
+            return
         ctx = SessionContext(room_id, player, room_service, connection_manager, websocket)
         await _run_session_loop(ctx)
 

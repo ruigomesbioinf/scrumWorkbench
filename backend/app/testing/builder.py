@@ -1,6 +1,8 @@
 import random
 import uuid
+from typing import Any
 
+from app.decks import get_deck
 from app.models.deck import CardDeck, DeckType
 from app.models.rooms import Player, Room, RoomState
 
@@ -122,3 +124,24 @@ class BuildRoom:
             state=RoomState.REVEALED,
             players={p.player_id: p for p in players},
         )
+
+
+class BuilderWSMessage:
+    @staticmethod
+    def join_message() -> dict[str, Any]:
+        return {"type": "join", "payload": {"username": Builder.random_string("User")}}
+
+    @staticmethod
+    def vote_message(deck_type: str) -> dict[str, Any]:
+        deck = get_deck(DeckType(deck_type))
+
+        valid_values = [v for v in deck.values if v != "?"]
+        return {"type": "vote", "payload": {"vote": random.choice(valid_values)}}
+
+    @staticmethod
+    def reveal_message() -> dict[str, Any]:
+        return {"type": "reveal", "payload": {}}
+
+    @staticmethod
+    def reset_message() -> dict[str, Any]:
+        return {"type": "reset", "payload": {}}
